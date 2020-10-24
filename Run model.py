@@ -50,8 +50,8 @@ xneg.shape, xpos.shape
 xneg.dtype, xpos.dtype
 
 # Report how many images didn't meet shapre requirements *in future need way to interpolate these?*
-print(str(xneg.shape[0]) + ' out of ' + str(len(glob.glob("C:/Users/new user/Documents/Image recognition in python/breast cancer image classification/test images/*/0/*.png"))) + ' negative images retained')
-print(str(xpos.shape[0]) + ' out of ' + str(len(glob.glob("C:/Users/new user/Documents/Image recognition in python/breast cancer image classification/test images/*/1/*.png"))) + ' positive images retained')
+print(str(xneg.shape[0]) + ' out of ' + str(len(glob.glob("C:/Users/new user/Documents/Image recognition in python/cancer-image-classification/test images/*/0/*.png"))) + ' negative images retained')
+print(str(xpos.shape[0]) + ' out of ' + str(len(glob.glob("C:/Users/new user/Documents/Image recognition in python/cancer-image-classification/test images/*/1/*.png"))) + ' positive images retained')
 
 #%% Create y values (target labels) from image data
 print("creating image labels - pos or neg\n")
@@ -221,11 +221,11 @@ def imagepredict(path):
 xx = model.predict_classes(X_test)
 
 # Run prediction for multiple pos and neg images
-imagepredict("C:/Users/new user/Documents/Image recognition in python/breast cancer image classification/images/10272/1/10272_idx5_x1651_y951_class1.png")
-imagepredict("C:/Users/new user/Documents/Image recognition in python/breast cancer image classification/images/9347/0/9347_idx5_x51_y451_class0.png")
-imagepredict("C:/Users/new user/Documents/Image recognition in python/breast cancer image classification/images/16570/1/16570_idx5_x1501_y1101_class1.png")
-imagepredict("C:/Users/new user/Documents/Image recognition in python/breast cancer image classification/images/16167/0/16167_idx5_x1801_y951_class0.png")
-imagepredict("C:/Users/new user/Documents/Image recognition in python/breast cancer image classification/images/14192/0/14192_idx5_x301_y1_class0.png")
+imagepredict("C:/Users/new user/Documents/Image recognition in python/cancer-image-classification/images/10272/1/10272_idx5_x1651_y951_class1.png")
+imagepredict("C:/Users/new user/Documents/Image recognition in python/cancer-image-classification/images/9347/0/9347_idx5_x51_y451_class0.png")
+imagepredict("C:/Users/new user/Documents/Image recognition in python/cancer-image-classification/images/16570/1/16570_idx5_x1501_y1101_class1.png")
+imagepredict("C:/Users/new user/Documents/Image recognition in python/cancer-image-classification/images/16167/0/16167_idx5_x1801_y951_class0.png")
+imagepredict("C:/Users/new user/Documents/Image recognition in python/cancer-image-classification/images/14192/0/14192_idx5_x301_y1_class0.png")
 
 # end
 l = []
