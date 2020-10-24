@@ -101,7 +101,6 @@ ntot = y.shape[0]
 indices = np.random.permutation(ntot)
 cutoffIndex = round(ntot*0.8)
 training_idx, test_idx = indices[:cutoffIndex], indices[cutoffIndex:]
-training, test = x[training_idx,:], x[test_idx,:]
 x_train = x[training_idx, :,:,]
 x_test = x[test_idx, :,:,]
 y_train = y[training_idx]
