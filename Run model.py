@@ -160,10 +160,10 @@ X_test = X_test.astype('float32')
 X_train = X_train / 255.0
 X_test = X_test / 255.0
 
-# one hot encode outputs
-y_train = np_utils.to_categorical(y_train)
-y_test = np_utils.to_categorical(y_test)
-num_classes = y_test.shape[1]
+## one hot encode outputs ***ALSO UPDATE FINAL DENSE LAYER ***
+#y_train = np_utils.to_categorical(y_train)
+#y_test = np_utils.to_categorical(y_test)
+#num_classes = y_test.shape[1]
 
 # Create the model
 print("Creating model\n")
@@ -202,8 +202,9 @@ model.add(Dense(128, kernel_constraint=maxnorm(3)))
 model.add(Activation('relu'))
 model.add(Dropout(0.2))
 model.add(BatchNormalization())
-model.add(Dense(num_classes))
-model.add(Activation('softmax'))
+# Choose final layer ***ALSO HASH/UNHASH ONE HOT ENCODE SECTION ABOVE ***
+#model.add(Dense(num_classes, activation='softmax')) # use dense(2) or dense(1) as per this https://stackoverflow.com/questions/61095033/output-layer-for-binary-classification-in-keras
+model.add(Dense(1, activation='sigmoid'))
 
 epochs =5
 optimizer = 'Adam'
