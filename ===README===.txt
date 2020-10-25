@@ -8,3 +8,5 @@ For downloading data direct to EC2: used the kaggle API as described here https:
 
 # where i'm up to:
 - need to re-clone repo into ec2 machien and redownload data *but do into images/ subdir* then unzip.
+
+# also deleted ppk and pem files - resaved from Downloads but may not work anymore, in which case delete VM and start again :(

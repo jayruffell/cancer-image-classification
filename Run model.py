@@ -8,12 +8,18 @@
     # then cd into this script's dir, then
     # python "read in images and run model.r"
 
-#%% import libs
+#%% import libs and set params
 import imageio
 import glob
 import numpy as np
 import sys
 #from matplotlib import pyplot as pl # for visualising images
+
+# Name of folder to pull images from - 'test images' or 'images' (former much smaller) 
+imagedir = 'test images' 
+
+# downsample training data?
+downsample = True
 
 #%% Read in all X (images) data, reading in pos and neg classes separately
 print("reading in images\n")
@@ -28,7 +34,7 @@ def readimages(target):
     
    # initiate array
     l=[]
-    for im_path in glob.glob("C:/Users/new user/Documents/Image recognition in python/cancer-image-classification/test images/*/" + target + "/*.png"):
+    for im_path in glob.glob("C:/Users/new user/Documents/Image recognition in python/cancer-image-classification/" + imagedir + "/*/" + target + "/*.png"):
         im = imageio.imread(im_path)
         print(im_path)
         
@@ -50,8 +56,8 @@ xneg.shape, xpos.shape
 xneg.dtype, xpos.dtype
 
 # Report how many images didn't meet shapre requirements *in future need way to interpolate these?*
-print(str(xneg.shape[0]) + ' out of ' + str(len(glob.glob("C:/Users/new user/Documents/Image recognition in python/cancer-image-classification/test images/*/0/*.png"))) + ' negative images retained')
-print(str(xpos.shape[0]) + ' out of ' + str(len(glob.glob("C:/Users/new user/Documents/Image recognition in python/cancer-image-classification/test images/*/1/*.png"))) + ' positive images retained')
+print(str(xneg.shape[0]) + ' out of ' + str(len(glob.glob("C:/Users/new user/Documents/Image recognition in python/cancer-image-classification/" + imagedir + "/*/0/*.png"))) + ' negative images retained')
+print(str(xpos.shape[0]) + ' out of ' + str(len(glob.glob("C:/Users/new user/Documents/Image recognition in python/cancer-image-classification/" + imagedir + "/*/1/*.png"))) + ' positive images retained')
 
 #%% Create y values (target labels) from image data
 print("creating image labels - pos or neg\n")
@@ -80,6 +86,14 @@ yneg = createTargets('0')
 yneg.dtype, ypos.dtype
 yneg.shape, ypos.shape
 
+#%% Downsample training data if specified. 
+downsample = True
+if downsample:
+    yneg = yneg[:len(ypos)]
+    xneg = xneg[:len(ypos)]
+    print('\ndownsampling - ASSUMING POS CLASS IS THE ONE TO DOWNSAMPLE\n')
+    # NB would be better to randomly downsample, but I'm shuffling later so just taking first n vakues as a shortcut.
+
 #%% bind neg and pos values together
 
 print("binding pos and neg values togther, then creating train/test split\n")
@@ -94,7 +108,7 @@ y = y.reshape(y.shape[0], 1)
 x.shape[0] == xneg.shape[0] + xpos.shape[0]
 y.shape[0] == yneg.shape[0] + ypos.shape[0]
 
-#%% split into train and test sets - 80% train
+#%% split into train and test sets - 80% train. This also shuffles
 
 np.random.seed(1203)
 ntot = y.shape[0]
@@ -136,6 +150,7 @@ from keras.constraints import maxnorm
 from keras.layers.convolutional import Conv2D, MaxPooling2D
 from keras.utils import np_utils
 #from keras.datasets import cifar10
+from keras import metrics # for AUC
 
 print("normalising inputs and one-hot-encoding target\n")
 
@@ -190,10 +205,11 @@ model.add(BatchNormalization())
 model.add(Dense(num_classes))
 model.add(Activation('softmax'))
 
-epochs = 25
+epochs =5
 optimizer = 'Adam'
 
-model.compile(loss='categorical_crossentropy', optimizer=optimizer, metrics=['accuracy'])
+model.compile(loss='binary_crossentropy', optimizer=optimizer, 
+              metrics=['accuracy'])
 
 print(model.summary())
 
@@ -217,14 +233,15 @@ def imagepredict(path):
     print(path)
     print(model.predict_classes(im))
     
+
 xx = model.predict_classes(X_test)
 
 # Run prediction for multiple pos and neg images
-imagepredict("C:/Users/new user/Documents/Image recognition in python/cancer-image-classification/images/10272/1/10272_idx5_x1651_y951_class1.png")
-imagepredict("C:/Users/new user/Documents/Image recognition in python/cancer-image-classification/images/9347/0/9347_idx5_x51_y451_class0.png")
-imagepredict("C:/Users/new user/Documents/Image recognition in python/cancer-image-classification/images/16570/1/16570_idx5_x1501_y1101_class1.png")
-imagepredict("C:/Users/new user/Documents/Image recognition in python/cancer-image-classification/images/16167/0/16167_idx5_x1801_y951_class0.png")
-imagepredict("C:/Users/new user/Documents/Image recognition in python/cancer-image-classification/images/14192/0/14192_idx5_x301_y1_class0.png")
+imagepredict("C:/Users/new user/Documents/Image recognition in python/cancer-image-classification/" + imagedir + "/10272/1/10272_idx5_x1651_y951_class1.png")
+imagepredict("C:/Users/new user/Documents/Image recognition in python/cancer-image-classification/" + imagedir + "/9347/0/9347_idx5_x51_y451_class0.png")
+imagepredict("C:/Users/new user/Documents/Image recognition in python/cancer-image-classification/" + imagedir + "/16570/1/16570_idx5_x1501_y1101_class1.png")
+imagepredict("C:/Users/new user/Documents/Image recognition in python/cancer-image-classification/" + imagedir + "/16167/0/16167_idx5_x1801_y951_class0.png")
+imagepredict("C:/Users/new user/Documents/Image recognition in python/cancer-image-classification/" + imagedir + "/14192/0/14192_idx5_x301_y1_class0.png")
 
 # end
 l = []

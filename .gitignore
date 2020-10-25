@@ -1,7 +1,7 @@
 images
 test images
-jay-tensorflow2.pem
-jay-tensorflow2.ppk
+*.pem
+*.ppk
 
 
 # Byte-compiled / optimized / DLL files
