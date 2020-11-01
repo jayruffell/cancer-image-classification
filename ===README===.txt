@@ -1,7 +1,7 @@
 aim is to use deep learning code here https://stackabuse.com/image-recognition-in-python-with-tensorflow-and-keras/ to classify cancer data here https://www.kaggle.com/paultimothymooney/breast-histopathology-images?
 
 could also do as per this full tutorial, but wanna try myself. https://www.pyimagesearch.com/2019/02/18/breast-cancer-classification-with-keras-and-deep-learning/
-...or this tutorial https://www.kdnuggets.com/2019/10/convolutional-neural-network-breast-cancer-classification.html
+...or this tutorial https://towardsdatascience.com/convolutional-neural-network-for-breast-cancer-classification-52f1213dcc9
 
 For downloading data direct to EC2: used the kaggle API as described here https://www.kaggle.com/general/6604. notes:
 - also had to download a kaggle.json file locally from the kaggle home page and then scp this into the ~/.kaggle folder to get kaggle working (did kaggle --version to check)
@@ -10,4 +10,3 @@ For downloading data direct to EC2: used the kaggle API as described here https:
 # where i'm up to:
 - need to re-clone repo into ec2 machien and redownload data *but do into images/ subdir* then unzip.
 
-# also deleted ppk and pem files - resaved from Downloads but may not work anymore, in which case delete VM and start again :(

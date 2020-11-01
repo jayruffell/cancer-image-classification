@@ -161,10 +161,10 @@ X_test = X_test.astype('float32')
 X_train = X_train / 255.0
 X_test = X_test / 255.0
 
-# one hot encode outputs ***ALSO UPDATE FINAL DENSE LAYER ***
-y_train = np_utils.to_categorical(y_train)
-y_test = np_utils.to_categorical(y_test)
-num_classes = y_test.shape[1]
+## one hot encode outputs ***ALSO UPDATE FINAL DENSE LAYER ***
+#y_train = np_utils.to_categorical(y_train)
+#y_test = np_utils.to_categorical(y_test)
+#um_classes = y_test.shape[1]
 
 # Create the model
 print("Creating model\n")
@@ -204,8 +204,8 @@ model.add(Activation('relu'))
 model.add(Dropout(0.2))
 model.add(BatchNormalization())
 # Choose final layer ***ALSO HASH/UNHASH ONE HOT ENCODE SECTION ABOVE ***
-model.add(Dense(num_classes, activation='softmax')) # use dense(2) or dense(1) as per this https://stackoverflow.com/questions/61095033/output-layer-for-binary-classification-in-keras
-# model.add(Dense(1, activation='sigmoid'))
+#model.add(Dense(num_classes, activation='softmax')) # use dense(2) or dense(1) as per this https://stackoverflow.com/questions/61095033/output-layer-for-binary-classification-in-keras
+model.add(Dense(1, activation='sigmoid'))
 
 epochs =10
 batch_size=32 # orgin tut said 64, but other site says 32 best starting point.
@@ -217,7 +217,7 @@ model.compile(loss='binary_crossentropy', optimizer=optimizer,
 print(model.summary())
 
 # instantiate checkpoint (so best epoch can be re-loaded later). From here https://medium.com/@italojs/saving-your-weights-for-each-epoch-keras-callbacks-b494d9648202
-checkpoint = ModelCheckpoint("best_model.hdf5", monitor='loss', verbose=1, save_best_only=True, mode='auto', period=1)
+checkpoint = ModelCheckpoint("best_model.hdf5", monitor='val_loss', verbose=1, save_best_only=True, mode='auto', period=1)
 
 print("Fitting model\n")
 #model.fit(X_train, y_train, validation_data=(X_test, y_test), epochs=epochs, batch_size=batch_size)
