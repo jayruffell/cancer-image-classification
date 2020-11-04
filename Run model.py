@@ -9,10 +9,13 @@
     # python "read in images and run model.r"
 
 #%% import libs and set params
-import imageio
+#import imageio
+from PIL import Image
 import glob
 import numpy as np
 import sys
+import os
+
 #from matplotlib import pyplot as pl # for visualising images
 
 # Name of folder to pull images from - 'test images' or 'images' (former much smaller) 
@@ -24,6 +27,8 @@ downsample = True
 #%% Read in all X (images) data, reading in pos and neg classes separately
 print("reading in images\n")
 
+# pixels for transfer learning 
+RESIZE = 224 
 def readimages(target):
     """Loops thru png images either posivite or negative for cancer and appends to a numpy array
     Parameters:
@@ -31,15 +36,18 @@ def readimages(target):
     Returns:
     numpy array of images, of shape (numimages, numpixels1, numpixels2, numRGBVals). So (numimages, 50, 50, 3) here
    """
-    
+   
    # initiate array
     l=[]
     for im_path in glob.glob("C:/Users/new user/Documents/Image recognition in python/cancer-image-classification/" + imagedir + "/*/" + target + "/*.png"):
-        im = imageio.imread(im_path)
+        
+        im = Image.open(im_path)
         print(im_path)
         
-#        # only add to data if image has correct dimensions
-        if im.shape == (50,50,3):
+        # only add to data if image has correct dimensions
+        if im.size == (50,50):
+            im = im.resize((RESIZE, RESIZE))
+            im = np.array(im)
             l.append(im)
     
     # convert to numpy array - necessary as imageio is a nparray class
@@ -141,6 +149,106 @@ y_test[0:19]
 #pl.imshow(x_test[2])
 
 #%% Follow along with tutorial!
+
+(x_train, y_train), (x_val, y_val) = (x_train, y_train), (x_test, y_test)
+del x_test, y_test
+from keras import layers
+from keras.applications import DenseNet201
+from keras.callbacks import Callback, ModelCheckpoint, ReduceLROnPlateau, TensorBoard
+from keras.preprocessing.image import ImageDataGenerator
+from keras.utils.np_utils import to_categorical
+from keras.models import Sequential
+from keras.optimizers import Adam
+from keras.utils import np_utils
+
+# normalize inputs from 0-255 to 0.0-1.0 - jay edit: np.max(X_train shows this is still appropriate max value)
+x_train = x_train.astype('float32')
+x_val = x_val.astype('float32')
+x_train = x_train / 255.0
+x_val = x_val / 255.0
+
+## one hot encode outputs ***ALSO UPDATE FINAL DENSE LAYER ***
+y_train = np_utils.to_categorical(y_train)
+y_val = np_utils.to_categorical(y_val)
+num_classes = y_val.shape[1]
+
+#%% flip, zoom images to improve sample size (and improve model regardless?)
+BATCH_SIZE = 16
+
+# train_generator = ImageDataGenerator(
+#         zoom_range=2,  # set range for random zoom
+#         rotation_range = 90,
+#         horizontal_flip=True,  # randomly flip images
+#         vertical_flip=True,  # randomly flip images
+#     )
+
+#%% Define model
+model = Sequential()
+model.add(DenseNet201(
+    weights='imagenet',
+    include_top=False,
+    input_shape=(224,224,3)))
+model.add(layers.GlobalAveragePooling2D())
+model.add(layers.Dropout(0.5))
+model.add(layers.BatchNormalization())
+model.add(layers.Dense(2, activation='softmax'))
+    
+model.compile(
+    loss='binary_crossentropy',
+    optimizer=Adam(lr=1e-4),
+    metrics=['accuracy']
+    )
+
+model.summary()
+
+#%% run
+
+# --------------------- WHERE IM UP TO: -----------------------------
+# - haven't really documented anything, so still need to do this
+# - check if i should be freezing base model, and if so how? Think this is why it's taking ages.
+# - check if my selected base model needs a particular normalisation or not, e.g. may be screwing things by doing val/255
+
+
+print("Fitting model\n")
+
+learn_control = ReduceLROnPlateau(monitor='val_acc', patience=5,
+                                  verbose=1,factor=0.2, min_lr=1e-7)
+
+filepath="weights.best.hdf5"
+checkpoint = ModelCheckpoint(filepath, monitor='val_acc', verbose=1, save_best_only=True, mode='max')
+
+# myhistory = model.fit_generator(  # only needed if using train_generator, which is failing silently (OOM error i think)
+#     train_generator.flow(x_train, y_train, batch_size=BATCH_SIZE),
+#     steps_per_epoch=x_train.shape[0] / BATCH_SIZE,
+#     epochs=5,
+#     validation_data=(x_val, y_val),
+#     callbacks=[learn_control, checkpoint]
+# )
+
+model.fit(x_train, y_train, 
+          validation_data=(x_val, y_val), 
+          epochs=5, batch_size=BATCH_SIZE,
+          callbacks=[learn_control, checkpoint])
+
+## [to load an earlier epoch]
+#from keras.models import load_model
+#model = load_model('model.h5')
+
+# Final evaluation of the model
+print("Evaluating model\n")
+scores = model.evaluate(X_test, y_test, verbose=0)
+print("Accuracy: %.2f%%" % (scores[1]*100))
+
+history
+history_df = pd.DataFrame(history.history)
+history_df[['loss', 'val_loss']].plot()
+
+history_df = pd.DataFrame(history.history)
+history_df[['acc', 'val_acc']].plot()
+
+
+
+#%% Follow along with tutorial!
 (X_train, y_train), (X_test, y_test) = (x_train, y_train), (x_test, y_test)
 del x_test, x_train
 
@@ -164,7 +272,7 @@ X_test = X_test / 255.0
 ## one hot encode outputs ***ALSO UPDATE FINAL DENSE LAYER ***
 #y_train = np_utils.to_categorical(y_train)
 #y_test = np_utils.to_categorical(y_test)
-#um_classes = y_test.shape[1]
+#num_classes = y_test.shape[1]
 
 # Create the model
 print("Creating model\n")
