@@ -16,7 +16,7 @@ import sys
 #from matplotlib import pyplot as pl # for visualising images
 
 # Name of folder to pull images from - 'test images' or 'images' (former much smaller) 
-imagedir = 'test images' 
+imagedir = 'images' 
 
 # downsample training data?
 downsample = True
