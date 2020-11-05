@@ -14,7 +14,6 @@ from PIL import Image
 import glob
 import numpy as np
 import sys
-import os
 
 #from matplotlib import pyplot as pl # for visualising images
 
@@ -39,7 +38,7 @@ def readimages(target):
    
    # initiate array
     l=[]
-    for im_path in glob.glob("C:/Users/new user/Documents/Image recognition in python/cancer-image-classification/" + imagedir + "/*/" + target + "/*.png"):
+    for im_path in glob.glob("./" + imagedir + "/*/" + target + "/*.png"):
         
         im = Image.open(im_path)
         print(im_path)
@@ -64,8 +63,8 @@ xneg.shape, xpos.shape
 xneg.dtype, xpos.dtype
 
 # Report how many images didn't meet shapre requirements *in future need way to interpolate these?*
-print(str(xneg.shape[0]) + ' out of ' + str(len(glob.glob("C:/Users/new user/Documents/Image recognition in python/cancer-image-classification/" + imagedir + "/*/0/*.png"))) + ' negative images retained')
-print(str(xpos.shape[0]) + ' out of ' + str(len(glob.glob("C:/Users/new user/Documents/Image recognition in python/cancer-image-classification/" + imagedir + "/*/1/*.png"))) + ' positive images retained')
+print(str(xneg.shape[0]) + ' out of ' + str(len(glob.glob("./" + imagedir + "/*/0/*.png"))) + ' negative images retained')
+print(str(xpos.shape[0]) + ' out of ' + str(len(glob.glob("./" + imagedir + "/*/1/*.png"))) + ' positive images retained')
 
 #%% Create y values (target labels) from image data
 print("creating image labels - pos or neg\n")
@@ -217,7 +216,7 @@ learn_control = ReduceLROnPlateau(monitor='val_acc', patience=5,
 filepath="weights.best.hdf5"
 checkpoint = ModelCheckpoint(filepath, monitor='val_acc', verbose=1, save_best_only=True, mode='max')
 
-# myhistory = model.fit_generator(  # only needed if using train_generator, which is failing silently (OOM error i think)
+# history = model.fit_generator(  # only needed if using train_generator, which is failing silently (OOM error i think)
 #     train_generator.flow(x_train, y_train, batch_size=BATCH_SIZE),
 #     steps_per_epoch=x_train.shape[0] / BATCH_SIZE,
 #     epochs=5,
@@ -236,147 +235,135 @@ model.fit(x_train, y_train,
 
 # Final evaluation of the model
 print("Evaluating model\n")
-scores = model.evaluate(X_test, y_test, verbose=0)
+scores = model.evaluate(x_val, y_val, verbose=0)
 print("Accuracy: %.2f%%" % (scores[1]*100))
 
-history
-history_df = pd.DataFrame(history.history)
-history_df[['loss', 'val_loss']].plot()
+# history
+# history_df = pd.DataFrame(history.history)
+# history_df[['loss', 'val_loss']].plot()
 
-history_df = pd.DataFrame(history.history)
-history_df[['acc', 'val_acc']].plot()
+# history_df = pd.DataFrame(history.history)
+# history_df[['acc', 'val_acc']].plot()
 
 
 
-#%% Follow along with tutorial!
-(X_train, y_train), (X_test, y_test) = (x_train, y_train), (x_test, y_test)
-del x_test, x_train
+# #%% Follow along with tutorial!
+# (X_train, y_train), (X_test, y_test) = (x_train, y_train), (x_test, y_test)
+# del x_test, x_train
 
-from keras.models import Sequential
-from keras.layers import Dense, Dropout, Flatten, BatchNormalization, Activation
-from keras.constraints import maxnorm
-from keras.layers.convolutional import Conv2D, MaxPooling2D
-from keras.utils import np_utils
-#from keras.datasets import cifar10
-from keras import metrics # for AUC
-from keras.callbacks import ModelCheckpoint
+# from keras.models import Sequential
+# from keras.layers import Dense, Dropout, Flatten, BatchNormalization, Activation
+# from keras.constraints import maxnorm
+# from keras.layers.convolutional import Conv2D, MaxPooling2D
+# from keras.utils import np_utils
+# #from keras.datasets import cifar10
+# from keras import metrics # for AUC
+# from keras.callbacks import ModelCheckpoint
 
-print("normalising inputs and one-hot-encoding target\n")
+# print("normalising inputs and one-hot-encoding target\n")
 
-# normalize inputs from 0-255 to 0.0-1.0 - jay edit: np.max(X_train shows this is still appropriate max value)
-X_train = X_train.astype('float32')
-X_test = X_test.astype('float32')
-X_train = X_train / 255.0
-X_test = X_test / 255.0
+# # normalize inputs from 0-255 to 0.0-1.0 - jay edit: np.max(X_train shows this is still appropriate max value)
+# X_train = X_train.astype('float32')
+# X_test = X_test.astype('float32')
+# X_train = X_train / 255.0
+# X_test = X_test / 255.0
 
-## one hot encode outputs ***ALSO UPDATE FINAL DENSE LAYER ***
-#y_train = np_utils.to_categorical(y_train)
-#y_test = np_utils.to_categorical(y_test)
-#num_classes = y_test.shape[1]
+# ## one hot encode outputs ***ALSO UPDATE FINAL DENSE LAYER ***
+# #y_train = np_utils.to_categorical(y_train)
+# #y_test = np_utils.to_categorical(y_test)
+# #num_classes = y_test.shape[1]
 
-# Create the model
-print("Creating model\n")
-model = Sequential()
+# # Create the model
+# print("Creating model\n")
+# model = Sequential()
 
-model.add(Conv2D(32, (3, 3), input_shape=X_train.shape[1:], padding='same'))
-model.add(Activation('relu'))
-model.add(Dropout(0.2))
-model.add(BatchNormalization())
+# model.add(Conv2D(32, (3, 3), input_shape=X_train.shape[1:], padding='same'))
+# model.add(Activation('relu'))
+# model.add(Dropout(0.2))
+# model.add(BatchNormalization())
 
-model.add(Conv2D(64, (3, 3), padding='same'))
-model.add(Activation('relu'))
-model.add(MaxPooling2D(pool_size=(2, 2)))
-model.add(Dropout(0.2))
-model.add(BatchNormalization())
+# model.add(Conv2D(64, (3, 3), padding='same'))
+# model.add(Activation('relu'))
+# model.add(MaxPooling2D(pool_size=(2, 2)))
+# model.add(Dropout(0.2))
+# model.add(BatchNormalization())
 
-model.add(Conv2D(64, (3, 3), padding='same'))
-model.add(Activation('relu'))
-model.add(MaxPooling2D(pool_size=(2, 2)))
-model.add(Dropout(0.2))
-model.add(BatchNormalization())
+# model.add(Conv2D(64, (3, 3), padding='same'))
+# model.add(Activation('relu'))
+# model.add(MaxPooling2D(pool_size=(2, 2)))
+# model.add(Dropout(0.2))
+# model.add(BatchNormalization())
 
-model.add(Conv2D(128, (3, 3), padding='same'))
-model.add(Activation('relu'))
-model.add(Dropout(0.2))
-model.add(BatchNormalization())
+# model.add(Conv2D(128, (3, 3), padding='same'))
+# model.add(Activation('relu'))
+# model.add(Dropout(0.2))
+# model.add(BatchNormalization())
 
-model.add(Flatten())
-model.add(Dropout(0.2))
+# model.add(Flatten())
+# model.add(Dropout(0.2))
 
-model.add(Dense(256, kernel_constraint=maxnorm(3)))
-model.add(Activation('relu'))
-model.add(Dropout(0.2))
-model.add(BatchNormalization())
-model.add(Dense(128, kernel_constraint=maxnorm(3)))
-model.add(Activation('relu'))
-model.add(Dropout(0.2))
-model.add(BatchNormalization())
-# Choose final layer ***ALSO HASH/UNHASH ONE HOT ENCODE SECTION ABOVE ***
-#model.add(Dense(num_classes, activation='softmax')) # use dense(2) or dense(1) as per this https://stackoverflow.com/questions/61095033/output-layer-for-binary-classification-in-keras
-model.add(Dense(1, activation='sigmoid'))
+# model.add(Dense(256, kernel_constraint=maxnorm(3)))
+# model.add(Activation('relu'))
+# model.add(Dropout(0.2))
+# model.add(BatchNormalization())
+# model.add(Dense(128, kernel_constraint=maxnorm(3)))
+# model.add(Activation('relu'))
+# model.add(Dropout(0.2))
+# model.add(BatchNormalization())
+# # Choose final layer ***ALSO HASH/UNHASH ONE HOT ENCODE SECTION ABOVE ***
+# #model.add(Dense(num_classes, activation='softmax')) # use dense(2) or dense(1) as per this https://stackoverflow.com/questions/61095033/output-layer-for-binary-classification-in-keras
+# model.add(Dense(1, activation='sigmoid'))
 
-epochs =10
-batch_size=32 # orgin tut said 64, but other site says 32 best starting point.
-optimizer = 'Adam'
+# epochs =10
+# batch_size=32 # orgin tut said 64, but other site says 32 best starting point.
+# optimizer = 'Adam'
 
-model.compile(loss='binary_crossentropy', optimizer=optimizer, 
-              metrics=['accuracy'])
+# model.compile(loss='binary_crossentropy', optimizer=optimizer, 
+#               metrics=['accuracy'])
 
-print(model.summary())
+# print(model.summary())
 
-# instantiate checkpoint (so best epoch can be re-loaded later). From here https://medium.com/@italojs/saving-your-weights-for-each-epoch-keras-callbacks-b494d9648202
-checkpoint = ModelCheckpoint("best_model.hdf5", monitor='val_loss', verbose=1, save_best_only=True, mode='auto', period=1)
+# # instantiate checkpoint (so best epoch can be re-loaded later). From here https://medium.com/@italojs/saving-your-weights-for-each-epoch-keras-callbacks-b494d9648202
+# checkpoint = ModelCheckpoint("best_model.hdf5", monitor='val_loss', verbose=1, save_best_only=True, mode='auto', period=1)
 
-print("Fitting model\n")
-#model.fit(X_train, y_train, validation_data=(X_test, y_test), epochs=epochs, batch_size=batch_size)
-model.fit(X_train, y_train, validation_split=0.3, epochs=epochs, batch_size=batch_size, callbacks=[checkpoint])
+# print("Fitting model\n")
+# #model.fit(X_train, y_train, validation_data=(X_test, y_test), epochs=epochs, batch_size=batch_size)
+# model.fit(X_train, y_train, validation_split=0.3, epochs=epochs, batch_size=batch_size, callbacks=[checkpoint])
 
-## [to load an earlier epoch]
-#from keras.models import load_model
-#model = load_model('model.h5')
+# ## [to load an earlier epoch]
+# #from keras.models import load_model
+# #model = load_model('model.h5')
 
-# Final evaluation of the model
-print("Evaluating model\n")
-scores = model.evaluate(X_test, y_test, verbose=0)
-print("Accuracy: %.2f%%" % (scores[1]*100))
+# # Final evaluation of the model
+# print("Evaluating model\n")
+# scores = model.evaluate(X_test, y_test, verbose=0)
+# print("Accuracy: %.2f%%" % (scores[1]*100))
 
-# And how about evaluating a single prediction?
-def imagepredict(path):
+# # And how about evaluating a single prediction?
+# def imagepredict(path):
     
-    im = imageio.imread(path)
-    im = np.expand_dims(im, axis=0) # cos trained in batchs, input is a tensor of shape [batch_size, image_width, image_height, number_of_channels]. So need to add a batch size dimension like this
+#     im = imageio.imread(path)
+#     im = np.expand_dims(im, axis=0) # cos trained in batchs, input is a tensor of shape [batch_size, image_width, image_height, number_of_channels]. So need to add a batch size dimension like this
     
-    # normalise as per training data
-    im = im.astype('float32')
-    im = im / 255.0
-    print(path)
-    print(model.predict_classes(im))
+#     # normalise as per training data
+#     im = im.astype('float32')
+#     im = im / 255.0
+#     print(path)
+#     print(model.predict_classes(im))
     
 
-xx = model.predict_classes(X_test)
+# xx = model.predict_classes(X_test)
 
-# Run prediction for multiple pos and neg images
-imagepredict("C:/Users/new user/Documents/Image recognition in python/cancer-image-classification/" + imagedir + "/10272/1/10272_idx5_x1651_y951_class1.png")
-imagepredict("C:/Users/new user/Documents/Image recognition in python/cancer-image-classification/" + imagedir + "/9347/0/9347_idx5_x51_y451_class0.png")
-imagepredict("C:/Users/new user/Documents/Image recognition in python/cancer-image-classification/" + imagedir + "/16570/1/16570_idx5_x1501_y1101_class1.png")
-imagepredict("C:/Users/new user/Documents/Image recognition in python/cancer-image-classification/" + imagedir + "/16167/0/16167_idx5_x1801_y951_class0.png")
-imagepredict("C:/Users/new user/Documents/Image recognition in python/cancer-image-classification/" + imagedir + "/14192/0/14192_idx5_x301_y1_class0.png")
+# # Run prediction for multiple pos and neg images
+# imagepredict("C:/Users/new user/Documents/Image recognition in python/cancer-image-classification/" + imagedir + "/10272/1/10272_idx5_x1651_y951_class1.png")
+# imagepredict("C:/Users/new user/Documents/Image recognition in python/cancer-image-classification/" + imagedir + "/9347/0/9347_idx5_x51_y451_class0.png")
+# imagepredict("C:/Users/new user/Documents/Image recognition in python/cancer-image-classification/" + imagedir + "/16570/1/16570_idx5_x1501_y1101_class1.png")
+# imagepredict("C:/Users/new user/Documents/Image recognition in python/cancer-image-classification/" + imagedir + "/16167/0/16167_idx5_x1801_y951_class0.png")
+# imagepredict("C:/Users/new user/Documents/Image recognition in python/cancer-image-classification/" + imagedir + "/14192/0/14192_idx5_x301_y1_class0.png")
 
-# end
-l = []
-for y in range(len(y_test)):
-    l.append(y_test[y][1])
+# # end
+# l = []
+# for y in range(len(y_test)):
+#     l.append(y_test[y][1])
 
-# ---- PROBLEM: it's calssifying everything as zeroes --------    
-
-
-
-
-
-
-
-
-
-
-
-
+# # ---- PROBLEM: it's calssifying everything as zeroes --------    
