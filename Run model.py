@@ -5,7 +5,7 @@
 
 # Could possible improve model by (1) randomly flipping/rotating images pre-training, as described in the tutorial (good when small sample size), and (2) freezing params then fine tuning - pretty much all TL tutorials say to do this, but my tutorial didn't
 
-# Current model has 93% accuracy on balanced sample though, and works great on heldout data :D
+# Current model has 93% accuracy on balanced sample though, based on images in 'testimages' dir on ec2 machine. Also tested on holdout data and accuracy is still excellent :D
 
 #%% import libs and set params
 #import imageio

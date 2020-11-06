@@ -1,10 +1,9 @@
 
 GENERAL STUFF -------------------------------------------------
 
-aim is to use deep learning code here https://stackabuse.com/image-recognition-in-python-with-tensorflow-and-keras/ to classify cancer data here https://www.kaggle.com/paultimothymooney/breast-histopathology-images?
+# Originally from this tutorial https://stackabuse.com/image-recognition-in-python-with-tensorflow-and-keras/, which was good for basics but didn't work for the breast cancer images. Ended up doing transfer learning with some help from this tut instead https://towardsdatascience.com/convolutional-neural-network-for-breast-cancer-classification-52f1213dcc9. TL is great when small sample size.
 
-could also do as per this full tutorial, but wanna try myself. https://www.pyimagesearch.com/2019/02/18/breast-cancer-classification-with-keras-and-deep-learning/
-...or this tutorial https://towardsdatascience.com/convolutional-neural-network-for-breast-cancer-classification-52f1213dcc9
+# Prepped code on linux box locally and then ran code on ec2 GPU machine, as described below.
 
 For downloading data direct to EC2: used the kaggle API as described here https://www.kaggle.com/general/6604. notes:
 - also had to download a kaggle.json file locally from the kaggle home page and then scp this into the ~/.kaggle folder to get kaggle working (did kaggle --version to check)
@@ -47,12 +46,13 @@ pip install tensorflow
 
 ##run script (back in main working dir)
 
-#first may need to re-install version of cudnn, or at least set environmental vars, as described here https://github.com/unnonouno/cudnnenv. as above i ensured active version was 'v7.6.5-cuda102'
+#first may need to re-install version of cudnn (if seeing cudnn-related error), or at least set environmental vars, as described here https://github.com/unnonouno/cudnnenv. as above i ensured active version was 'v7.6.5-cuda102'. To set env vars, per url:
+LD_LIBRARY_PATH=~/.cudnn/active/cuda/lib64:$LD_LIBRARY_PATH
+CPATH=~/.cudnn/active/cuda/include:$CPATH
+LIBRARY_PATH=~/.cudnn/active/cuda/lib64:$LIBRARY_PATH
 
-# NB use vi 'Run model.py' to manually set testimages or images dir as input - testimages worked well and proz way quicker (thanks transfer learning)
+# THen run script:
 python -i 'Run model.py' # -i lets u keep python vars after script runs
-
-
 
 
 
