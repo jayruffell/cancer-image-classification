@@ -1,12 +1,15 @@
-# From this tutorial https://stackabuse.com/image-recognition-in-python-with-tensorflow-and-keras/
-# If I wanna train on ec2 with a GPU, could do this (havnt tested) https://medium.com/coinmonks/a-step-by-step-guide-to-set-up-an-aws-ec2-for-deep-learning-8f1b96bf7984
 
-# I'm using a different dataset (breast cancer) per the readme file
+# --------------------- WHERE IM UP TO: -----------------------------
+# - haven't really documented anything, so still need to do this
+# - check if i should be freezing base model, and if so how? Think this is why it's taking ages.
+# - check if my selected base model needs a particular normalisation or not, e.g. may be screwing things by doing val/255
 
-# NOTE need to run in the tensorflow environment, which doesn't work with spyder. So can run like this:
-    # conda activate tensorflow
-    # then cd into this script's dir, then
-    # python "read in images and run model.r"
+
+# Originally from this tutorial https://stackabuse.com/image-recognition-in-python-with-tensorflow-and-keras/, which was good for basics but didn't work for the breast cancer images. Ended up doing transfer learning with this tut instead https://towardsdatascience.com/convolutional-neural-network-for-breast-cancer-classification-52f1213dcc9. TL is great when small sample size.
+
+# Prepped code on linux box locally and then ran code on ec2 GPU machine, per README file.
+
+# Could possible improve model by (1) randomly flipping/rotating images pre-training, as described in the tutorial (good when small sample size), and (2) freezing params then fine tuning - pretty much all TL tutorials say to do this, but my tutorial didn't (Got good accuracy anyway though)
 
 #%% import libs and set params
 #import imageio
@@ -14,11 +17,20 @@ from PIL import Image
 import glob
 import numpy as np
 import sys
-
+from keras import layers
+from keras.applications import DenseNet201
+from keras.callbacks import ModelCheckpoint, ReduceLROnPlateau
+# from keras.preprocessing.image import ImageDataGenerator
+from keras.models import Sequential
+from keras.optimizers import Adam
+from keras.utils import np_utils
 #from matplotlib import pyplot as pl # for visualising images
 
 # Name of folder to pull images from - 'test images' or 'images' (former much smaller) 
 imagedir = 'images' 
+
+# resize images to what size? Think required for transfer learning - should be same size as the base algo
+RESIZE = 224 
 
 # downsample training data?
 downsample = True
@@ -26,8 +38,6 @@ downsample = True
 #%% Read in all X (images) data, reading in pos and neg classes separately
 print("reading in images\n")
 
-# pixels for transfer learning 
-RESIZE = 224 
 def readimages(target):
     """Loops thru png images either posivite or negative for cancer and appends to a numpy array
     Parameters:
@@ -36,7 +46,7 @@ def readimages(target):
     numpy array of images, of shape (numimages, numpixels1, numpixels2, numRGBVals). So (numimages, 50, 50, 3) here
    """
    
-   # initiate array
+   # initiate array. ensure current workign directory is cancer-image-classification for glob.glob to work
     l=[]
     for im_path in glob.glob("./" + imagedir + "/*/" + target + "/*.png"):
         
@@ -151,14 +161,6 @@ y_test[0:19]
 
 (x_train, y_train), (x_val, y_val) = (x_train, y_train), (x_test, y_test)
 del x_test, y_test
-from keras import layers
-from keras.applications import DenseNet201
-from keras.callbacks import Callback, ModelCheckpoint, ReduceLROnPlateau, TensorBoard
-from keras.preprocessing.image import ImageDataGenerator
-from keras.utils.np_utils import to_categorical
-from keras.models import Sequential
-from keras.optimizers import Adam
-from keras.utils import np_utils
 
 # normalize inputs from 0-255 to 0.0-1.0 - jay edit: np.max(X_train shows this is still appropriate max value)
 x_train = x_train.astype('float32')
@@ -166,7 +168,7 @@ x_val = x_val.astype('float32')
 x_train = x_train / 255.0
 x_val = x_val / 255.0
 
-## one hot encode outputs ***ALSO UPDATE FINAL DENSE LAYER ***
+## one hot encode outputs 
 y_train = np_utils.to_categorical(y_train)
 y_val = np_utils.to_categorical(y_val)
 num_classes = y_val.shape[1]
@@ -197,16 +199,9 @@ model.compile(
     optimizer=Adam(lr=1e-4),
     metrics=['accuracy']
     )
-
 model.summary()
 
 #%% run
-
-# --------------------- WHERE IM UP TO: -----------------------------
-# - haven't really documented anything, so still need to do this
-# - check if i should be freezing base model, and if so how? Think this is why it's taking ages.
-# - check if my selected base model needs a particular normalisation or not, e.g. may be screwing things by doing val/255
-
 
 print("Fitting model\n")
 
@@ -216,14 +211,7 @@ learn_control = ReduceLROnPlateau(monitor='val_acc', patience=5,
 filepath="weights.best.hdf5"
 checkpoint = ModelCheckpoint(filepath, monitor='val_acc', verbose=1, save_best_only=True, mode='max')
 
-# history = model.fit_generator(  # only needed if using train_generator, which is failing silently (OOM error i think)
-#     train_generator.flow(x_train, y_train, batch_size=BATCH_SIZE),
-#     steps_per_epoch=x_train.shape[0] / BATCH_SIZE,
-#     epochs=5,
-#     validation_data=(x_val, y_val),
-#     callbacks=[learn_control, checkpoint]
-# )
-
+# fit model
 model.fit(x_train, y_train, 
           validation_data=(x_val, y_val), 
           epochs=5, batch_size=BATCH_SIZE,
@@ -238,14 +226,54 @@ print("Evaluating model\n")
 scores = model.evaluate(x_val, y_val, verbose=0)
 print("Accuracy: %.2f%%" % (scores[1]*100))
 
+# And how about evaluating a single prediction?
+def imagepredict(im_path):
+    
+     im = Image.open(im_path)
+     print(im_path)
+        
+     im = im.resize((RESIZE, RESIZE))
+     im = np.array(im)
+     im = np.expand_dims(im, axis=0) # cos trained in batchs, input is a tensor of shape [batch_size, image_width, image_height, number_of_channels]. So need to add a batch size dimension like this
+    
+     # normalise as per training data
+     im = im.astype('float32')
+     im = im / 255.0
+     print(model.predict_classes(im))
+    
+
+xx = model.predict_classes(x_val)
+
+# Run prediction for multiple pos and neg images
+imagepredict("./images/10272/1/10272_idx5_x1651_y951_class1.png")
+imagepredict("./images/9347/0/9347_idx5_x51_y451_class0.png")
+imagepredict("./images/16570/1/16570_idx5_x1501_y1101_class1.png")
+imagepredict("./images/16167/0/16167_idx5_x1801_y951_class0.png")
+imagepredict("./images/14192/0/14192_idx5_x301_y1_class0.png")
+
+
+#---------------------------------------------------------------------------------
+## Alternative model fit code from tutorial (together with 'history' plots below) - use if I'm generating training data by flipping/rotating images)
+# history = model.fit_generator(  # only needed if using train_generator, which is failing silently (OOM error i think)
+#     train_generator.flow(x_train, y_train, batch_size=BATCH_SIZE),
+#     steps_per_epoch=x_train.shape[0] / BATCH_SIZE,
+#     epochs=5,
+#     validation_data=(x_val, y_val),
+#     callbacks=[learn_control, checkpoint]
+# )
+
 # history
 # history_df = pd.DataFrame(history.history)
 # history_df[['loss', 'val_loss']].plot()
 
 # history_df = pd.DataFrame(history.history)
 # history_df[['acc', 'val_acc']].plot()
+#---------------------------------------------------------------------------------
 
 
+
+#---------------------------------------------------------------------------------
+## CODE FROM ORIGINAL TUTORIAL https://stackabuse.com/image-recognition-in-python-with-tensorflow-and-keras/
 
 # #%% Follow along with tutorial!
 # (X_train, y_train), (X_test, y_test) = (x_train, y_train), (x_test, y_test)
@@ -338,29 +366,4 @@ print("Accuracy: %.2f%%" % (scores[1]*100))
 # print("Evaluating model\n")
 # scores = model.evaluate(X_test, y_test, verbose=0)
 # print("Accuracy: %.2f%%" % (scores[1]*100))
-
-# And how about evaluating a single prediction?
-def imagepredict(im_path):
-    
-     im = Image.open(im_path)
-     print(im_path)
-        
-     im = im.resize((RESIZE, RESIZE))
-     im = np.array(im)
-     im = np.expand_dims(im, axis=0) # cos trained in batchs, input is a tensor of shape [batch_size, image_width, image_height, number_of_channels]. So need to add a batch size dimension like this
-    
-     # normalise as per training data
-     im = im.astype('float32')
-     im = im / 255.0
-     print(model.predict_classes(im))
-    
-
-xx = model.predict_classes(x_val)
-
-# Run prediction for multiple pos and neg images
-imagepredict("./images/10272/1/10272_idx5_x1651_y951_class1.png")
-imagepredict("./images/9347/0/9347_idx5_x51_y451_class0.png")
-imagepredict("./images/16570/1/16570_idx5_x1501_y1101_class1.png")
-imagepredict("./images/16167/0/16167_idx5_x1801_y951_class0.png")
-imagepredict("./images/14192/0/14192_idx5_x301_y1_class0.png")
 

@@ -37,7 +37,7 @@ mkdir testimages
 cp -R ./images/9173 ./testimages/9173
 cp -R ./images/14304 ./testimages/14304
 
-# NB use vi 'Run model.py' to manually set testimages or images dir as input
+# NB use vi 'Run model.py' to manually set testimages or images dir as input - testimages worked well and proz way quicker (thanks transfer learning)
 
 # download required packages
 pip install keras
@@ -46,14 +46,6 @@ pip install tensorflow
 
 #run script (back in main working dir)
 python -i 'Run model.py' # -i lets u keep python vars after script runs
-
--------------------------------- TO DO ----------------------------------------
-
-- commit linux home comp version and pull into ec2
-- test on more individual cases - think it's very accurately getting each case wrong!
-- figure out why it's getting everything exaclty *wrong*. is this one-hot encoding (where I'm assuming class 0 is gettign a zero but it's actually getting a 1?)
-
-
 
 
 
