@@ -157,7 +157,7 @@ y_test[0:19]
 #pl.imshow(x_train[4])
 #pl.imshow(x_test[2])
 
-#%% Follow along with tutorial!
+#%% FOLLOW ALONG WITH TUTORIAL!
 
 (x_train, y_train), (x_val, y_val) = (x_train, y_train), (x_test, y_test)
 del x_test, y_test
@@ -205,7 +205,7 @@ model.summary()
 
 print("Fitting model\n")
 
-learn_control = ReduceLROnPlateau(monitor='val_acc', patience=5,
+learn_control = ReduceLROnPlateau(monitor='val_accuracy', patience=5,
                                   verbose=1,factor=0.2, min_lr=1e-7)
 
 filepath="weights.best.hdf5"

@@ -16,6 +16,8 @@ RUNNING CODE ON EC2 MACHINE -------------------------------------------------
 ssh -i jay-tensorflow-linux2.pem ubuntu@ec2-public-dns (changes every time?)
 # e.g. ssh -i jay-tensorflow-linux2.pem ubuntu@ec2-3-25-106-142.ap-southeast-2.compute.amazonaws.com
 
+-------------- this code only required for initial machine setup --------------------------
+
 # Create directory for project via git
 git clone https://github.com/jayruffell/cancer-image-classification.git
 cd cancer-image-classification
@@ -37,14 +39,14 @@ mkdir testimages
 cp -R ./images/9173 ./testimages/9173
 cp -R ./images/14304 ./testimages/14304
 
-# NB use vi 'Run model.py' to manually set testimages or images dir as input - testimages worked well and proz way quicker (thanks transfer learning)
-
 # download required packages
 pip install keras
 pip install tensorflow
 # then if cudnn error, fix using cudnnenv as described here https://stackoverflow.com/questions/49960132/cudnn-library-compatibility-error-after-loading-model-weights/62610399#62610399. I used cudnnenv to switch to 'v7.6.5-cuda102'
+-------------- ------------------------------------------------------------------------------
 
 #run script (back in main working dir)
+# NB use vi 'Run model.py' to manually set testimages or images dir as input - testimages worked well and proz way quicker (thanks transfer learning)
 python -i 'Run model.py' # -i lets u keep python vars after script runs
 
 
