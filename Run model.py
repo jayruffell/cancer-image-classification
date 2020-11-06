@@ -339,31 +339,28 @@ print("Accuracy: %.2f%%" % (scores[1]*100))
 # scores = model.evaluate(X_test, y_test, verbose=0)
 # print("Accuracy: %.2f%%" % (scores[1]*100))
 
-# # And how about evaluating a single prediction?
-# def imagepredict(path):
+# And how about evaluating a single prediction?
+def imagepredict(im_path):
     
-#     im = imageio.imread(path)
-#     im = np.expand_dims(im, axis=0) # cos trained in batchs, input is a tensor of shape [batch_size, image_width, image_height, number_of_channels]. So need to add a batch size dimension like this
+     im = Image.open(im_path)
+     print(im_path)
+        
+     im = im.resize((RESIZE, RESIZE))
+     im = np.array(im)
+     im = np.expand_dims(im, axis=0) # cos trained in batchs, input is a tensor of shape [batch_size, image_width, image_height, number_of_channels]. So need to add a batch size dimension like this
     
-#     # normalise as per training data
-#     im = im.astype('float32')
-#     im = im / 255.0
-#     print(path)
-#     print(model.predict_classes(im))
+     # normalise as per training data
+     im = im.astype('float32')
+     im = im / 255.0
+     print(model.predict_classes(im))
     
 
-# xx = model.predict_classes(X_test)
+xx = model.predict_classes(x_val)
 
-# # Run prediction for multiple pos and neg images
-# imagepredict("C:/Users/new user/Documents/Image recognition in python/cancer-image-classification/" + imagedir + "/10272/1/10272_idx5_x1651_y951_class1.png")
-# imagepredict("C:/Users/new user/Documents/Image recognition in python/cancer-image-classification/" + imagedir + "/9347/0/9347_idx5_x51_y451_class0.png")
-# imagepredict("C:/Users/new user/Documents/Image recognition in python/cancer-image-classification/" + imagedir + "/16570/1/16570_idx5_x1501_y1101_class1.png")
-# imagepredict("C:/Users/new user/Documents/Image recognition in python/cancer-image-classification/" + imagedir + "/16167/0/16167_idx5_x1801_y951_class0.png")
-# imagepredict("C:/Users/new user/Documents/Image recognition in python/cancer-image-classification/" + imagedir + "/14192/0/14192_idx5_x301_y1_class0.png")
+# Run prediction for multiple pos and neg images
+imagepredict("./images/10272/1/10272_idx5_x1651_y951_class1.png")
+imagepredict("./images/9347/0/9347_idx5_x51_y451_class0.png")
+imagepredict("./images/16570/1/16570_idx5_x1501_y1101_class1.png")
+imagepredict("./images/16167/0/16167_idx5_x1801_y951_class0.png")
+imagepredict("./images/14192/0/14192_idx5_x301_y1_class0.png")
 
-# # end
-# l = []
-# for y in range(len(y_test)):
-#     l.append(y_test[y][1])
-
-# # ---- PROBLEM: it's calssifying everything as zeroes --------    
