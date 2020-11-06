@@ -3,7 +3,7 @@
 
 # Prepped code on linux box locally and then ran code on ec2 GPU machine, per README file.
 
-# Could possible improve model by (1) randomly flipping/rotating images pre-training, as described in the tutorial (good when small sample size), and (2) freezing params then fine tuning - pretty much all TL tutorials say to do this, but my tutorial didn't
+# Could possible improve model by (1) randomly flipping/rotating images pre-training, as described in the tutorial (good when small sample size), and (2) freezing params then fine tuning - pretty much all TL tutorials say to do this, but my tutorial didn't. (3) could also load best model from checkpoints prior to predictions, as described here https://machinelearningmastery.com/check-point-deep-learning-models-keras/
 
 # Current model has 93% accuracy on balanced sample though, based on images in 'testimages' dir on ec2 machine. Also tested on holdout data and accuracy is still excellent :D
 
