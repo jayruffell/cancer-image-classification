@@ -7,11 +7,13 @@
 
 # Current model has 93% accuracy on balanced sample though, based on images in 'testimages' dir on ec2 machine. Also tested on holdout data and accuracy is still excellent :D
 
-#%% import libs and set params
+#%% import libs and set params. have to start with setting np and tf seeds
+
+import numpy as np
+np.random.seed(1203)
 #import imageio
 from PIL import Image
 import glob
-import numpy as np
 import sys
 from keras import layers
 from keras.applications import DenseNet201
@@ -123,7 +125,6 @@ y.shape[0] == yneg.shape[0] + ypos.shape[0]
 
 #%% split into train and test sets - 80% train. This also shuffles
 
-np.random.seed(1203)
 ntot = y.shape[0]
 indices = np.random.permutation(ntot)
 cutoffIndex = round(ntot*0.8)
@@ -205,7 +206,7 @@ learn_control = ReduceLROnPlateau(monitor='val_accuracy', patience=5,
                                   verbose=1,factor=0.2, min_lr=1e-7)
 
 filepath="weights.best.hdf5"
-checkpoint = ModelCheckpoint(filepath, monitor='val_acc', verbose=1, save_best_only=True, mode='max')
+checkpoint = ModelCheckpoint(filepath, monitor='val_accuracy', verbose=1, save_best_only=True, mode='max')
 
 # fit model
 model.fit(x_train, y_train, 
