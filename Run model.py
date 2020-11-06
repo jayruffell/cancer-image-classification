@@ -250,6 +250,18 @@ imagepredict("./images/9347/0/9347_idx5_x51_y451_class0.png")
 imagepredict("./images/16570/1/16570_idx5_x1501_y1101_class1.png")
 imagepredict("./images/16167/0/16167_idx5_x1801_y951_class0.png")
 imagepredict("./images/14192/0/14192_idx5_x301_y1_class0.png")
+imagepredict("./images/10254/0/10254_idx5_x101_y801_class0.png")
+imagepredict("./images/10254/0/10254_idx5_x101_y801_class0.png")
+imagepredict("./images/10254/1/10254_idx5_x1651_y1401_class1.png")
+imagepredict("./images/10254/1/10254_idx5_x1651_y1401_class1.png")
+imagepredict("./images/10253/1/10253_idx5_x801_y751_class1.png")
+imagepredict("./images/10253/1/10253_idx5_x801_y751_class1.png")
+imagepredict("./images/10253/1/10253_idx5_x551_y701_class1.png")
+imagepredict("./images/10253/0/10253_idx5_x401_y1801_class0.png")
+imagepredict("./images/10253/0/10253_idx5_x2151_y1001_class0.png")
+imagepredict("./images/10253/0/10253_idx5_x401_y1801_class0.png")
+imagepredict("./images/10253/0/10253_idx5_x351_y1851_class0.png")
+imagepredict("./images/10253/0/10253_idx5_x401_y1851_class0.png")
 
 
 #---------------------------------------------------------------------------------
