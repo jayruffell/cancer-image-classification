@@ -102,7 +102,6 @@ yneg.dtype, ypos.dtype
 yneg.shape, ypos.shape
 
 #%% Downsample training data if specified. 
-downsample = True
 if downsample:
     yneg = yneg[:len(ypos)]
     xneg = xneg[:len(ypos)]
@@ -211,7 +210,7 @@ checkpoint = ModelCheckpoint(filepath, monitor='val_accuracy', verbose=1, save_b
 # fit model
 model.fit(x_train, y_train, 
           validation_data=(x_val, y_val), 
-          epochs=5, batch_size=BATCH_SIZE,
+          epochs=20, batch_size=BATCH_SIZE,
           callbacks=[learn_control, checkpoint])
 
 ## [to load an earlier epoch]
