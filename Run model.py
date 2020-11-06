@@ -1,15 +1,11 @@
 
-# --------------------- WHERE IM UP TO: -----------------------------
-# - haven't really documented anything, so still need to do this
-# - check if i should be freezing base model, and if so how? Think this is why it's taking ages.
-# - check if my selected base model needs a particular normalisation or not, e.g. may be screwing things by doing val/255
-
-
-# Originally from this tutorial https://stackabuse.com/image-recognition-in-python-with-tensorflow-and-keras/, which was good for basics but didn't work for the breast cancer images. Ended up doing transfer learning with this tut instead https://towardsdatascience.com/convolutional-neural-network-for-breast-cancer-classification-52f1213dcc9. TL is great when small sample size.
+# Originally from this tutorial https://stackabuse.com/image-recognition-in-python-with-tensorflow-and-keras/, which was good for basics but didn't work for the breast cancer images. Ended up doing transfer learning with some help from this tut instead https://towardsdatascience.com/convolutional-neural-network-for-breast-cancer-classification-52f1213dcc9. TL is great when small sample size.
 
 # Prepped code on linux box locally and then ran code on ec2 GPU machine, per README file.
 
-# Could possible improve model by (1) randomly flipping/rotating images pre-training, as described in the tutorial (good when small sample size), and (2) freezing params then fine tuning - pretty much all TL tutorials say to do this, but my tutorial didn't (Got good accuracy anyway though)
+# Could possible improve model by (1) randomly flipping/rotating images pre-training, as described in the tutorial (good when small sample size), and (2) freezing params then fine tuning - pretty much all TL tutorials say to do this, but my tutorial didn't
+
+# Current model has 93% accuracy on balanced sample though, and works great on heldout data :D
 
 #%% import libs and set params
 #import imageio
@@ -27,7 +23,7 @@ from keras.utils import np_utils
 #from matplotlib import pyplot as pl # for visualising images
 
 # Name of folder to pull images from - 'test images' or 'images' (former much smaller) 
-imagedir = 'images' 
+imagedir = 'testimages' 
 
 # resize images to what size? Think required for transfer learning - should be same size as the base algo
 RESIZE = 224 
@@ -240,11 +236,8 @@ def imagepredict(im_path):
      im = im.astype('float32')
      im = im / 255.0
      print(model.predict_classes(im))
-    
 
-xx = model.predict_classes(x_val)
-
-# Run prediction for multiple pos and neg images
+# Run prediction for multiple pos and neg images *none of which are in training or validation set if using imagedir = testimages*
 imagepredict("./images/10272/1/10272_idx5_x1651_y951_class1.png")
 imagepredict("./images/9347/0/9347_idx5_x51_y451_class0.png")
 imagepredict("./images/16570/1/16570_idx5_x1501_y1101_class1.png")

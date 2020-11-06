@@ -14,7 +14,7 @@ RUNNING CODE ON EC2 MACHINE -------------------------------------------------
 
 # ssh into jay-tensorflow2 machine.  *** While in dir with pem file: *** 
 ssh -i jay-tensorflow-linux2.pem ubuntu@ec2-public-dns (changes every time?)
-# e.g. ssh -i jay-tensorflow-linux2.pem ubuntu@ec2-3-25-106-142.ap-southeast-2.compute.amazonaws.com
+# e.g. ssh -i jay-tensorflow-linux2.pem ubuntu@ec2-54-206-122-65.ap-southeast-2.compute.amazonaws.com
 
 -------------- this code only required for initial machine setup --------------------------
 
@@ -45,7 +45,10 @@ pip install tensorflow
 # then if cudnn error, fix using cudnnenv as described here https://stackoverflow.com/questions/49960132/cudnn-library-compatibility-error-after-loading-model-weights/62610399#62610399. I used cudnnenv to switch to 'v7.6.5-cuda102'
 -------------- ------------------------------------------------------------------------------
 
-#run script (back in main working dir)
+##run script (back in main working dir)
+
+#first may need to re-install version of cudnn, or at least set environmental vars, as described here https://github.com/unnonouno/cudnnenv. as above i ensured active version was 'v7.6.5-cuda102'
+
 # NB use vi 'Run model.py' to manually set testimages or images dir as input - testimages worked well and proz way quicker (thanks transfer learning)
 python -i 'Run model.py' # -i lets u keep python vars after script runs
 
